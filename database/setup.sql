@@ -1,15 +1,8 @@
 -- =========================================
--- RESET DATABASE
--- =========================================
-DROP DATABASE IF EXISTS service_project_db;
-CREATE DATABASE service_project_db;
-USE service_project_db;
-
--- =========================================
 -- ORGANIZATIONS TABLE
 -- =========================================
-CREATE TABLE organizations (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS organizations (
+    id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     description TEXT
 );
@@ -17,33 +10,36 @@ CREATE TABLE organizations (
 -- =========================================
 -- PROJECTS TABLE
 -- =========================================
-CREATE TABLE projects (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS projects (
+    id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     description TEXT,
     organization_id INT,
-    FOREIGN KEY (organization_id) REFERENCES organizations(id)
+    CONSTRAINT fk_organization
+        FOREIGN KEY (organization_id) REFERENCES organizations(id)
         ON DELETE CASCADE
 );
 
 -- =========================================
 -- CATEGORIES TABLE
 -- =========================================
-CREATE TABLE categories (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS categories (
+    id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE
 );
 
 -- =========================================
 -- PROJECT_CATEGORIES TABLE
 -- =========================================
-CREATE TABLE project_categories (
+CREATE TABLE IF NOT EXISTS project_categories (
     project_id INT,
     category_id INT,
     PRIMARY KEY (project_id, category_id),
-    FOREIGN KEY (project_id) REFERENCES projects(id)
+    CONSTRAINT fk_project
+        FOREIGN KEY (project_id) REFERENCES projects(id)
         ON DELETE CASCADE,
-    FOREIGN KEY (category_id) REFERENCES categories(id)
+    CONSTRAINT fk_category
+        FOREIGN KEY (category_id) REFERENCES categories(id)
         ON DELETE CASCADE
 );
 
@@ -56,6 +52,7 @@ INSERT INTO organizations (name, description) VALUES
 ('UNICEF', 'Child welfare organization'),
 ('Local Community Group', 'Community development group');
 
+-- Since we are inserting into fresh tables, IDs 1, 2, and 3 will auto-generate seamlessly
 INSERT INTO projects (name, description, organization_id) VALUES
 ('Food Drive', 'Distribute food to families', 1),
 ('Clean Water Project', 'Provide clean water access', 2),

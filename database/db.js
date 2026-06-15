@@ -1,28 +1,25 @@
-import mysql from "mysql2/promise";
-import dotenv from "dotenv";
+import pkg from 'pg';
+const { Pool } = pkg;
+import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Create MySQL connection pool
-const pool = mysql.createPool({
+// Create a configuration object
+const dbConfig = {
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-});
+  port: process.env.DB_PORT || 5432,
+};
 
-// Optional test connection
-(async () => {
-  try {
-    const connection = await pool.getConnection();
-    console.log("MySQL Database connected successfully");
-    connection.release();
-  } catch (err) {
-    console.error("Database connection error:", err.message);
-  }
-})();
+// Only add SSL if we are NOT on localhost
+if (process.env.DB_HOST !== 'localhost') {
+  dbConfig.ssl = {
+    rejectUnauthorized: false
+  };
+}
+
+const pool = new Pool(dbConfig);
 
 export default pool;

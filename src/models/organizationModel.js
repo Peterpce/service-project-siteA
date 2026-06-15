@@ -4,7 +4,8 @@ import pool from "../../database/db.js";
  * Get all organizations
  */
 export async function getAllOrganizations() {
-  const [rows] = await pool.query(
+  // PostgreSQL uses object destructuring { rows } instead of array destructuring [rows]
+  const { rows } = await pool.query(
     "SELECT id, name, description FROM organizations ORDER BY id ASC"
   );
 
@@ -15,8 +16,10 @@ export async function getAllOrganizations() {
  * Get organization by ID (optional)
  */
 export async function getOrganizationById(id) {
-  const [rows] = await pool.query(
-    "SELECT id, name, description FROM organizations WHERE id = ?",
+  // 1. Changed [rows] to { rows }
+  // 2. Changed MySQL placeholder "?" to PostgreSQL placeholder "$1"
+  const { rows } = await pool.query(
+    "SELECT id, name, description FROM organizations WHERE id = $1",
     [id]
   );
 

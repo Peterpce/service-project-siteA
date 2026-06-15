@@ -1,10 +1,11 @@
 import pool from "../../database/db.js";
 
 /**
- * Get all categories from database
+ * Get all categories
  */
 export async function getAllCategories() {
-  const [rows] = await pool.query(
+  // Changed [rows] to { rows }
+  const { rows } = await pool.query(
     "SELECT id, name FROM categories ORDER BY name ASC"
   );
 
@@ -12,11 +13,12 @@ export async function getAllCategories() {
 }
 
 /**
- * Get single category by ID (optional for future use)
+ * Get category by ID (optional)
  */
 export async function getCategoryById(id) {
-  const [rows] = await pool.query(
-    "SELECT id, name FROM categories WHERE id = ?",
+  // Changed [rows] to { rows } and "?" to "$1"
+  const { rows } = await pool.query(
+    "SELECT id, name FROM categories WHERE id = $1",
     [id]
   );
 

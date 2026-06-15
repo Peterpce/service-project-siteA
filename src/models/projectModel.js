@@ -4,7 +4,7 @@ import pool from "../../database/db.js";
  * Get all projects with organization name
  */
 export async function getAllProjects() {
-  const [rows] = await pool.query(`
+  const { rows } = await pool.query(`
     SELECT 
       projects.id,
       projects.name,
@@ -23,7 +23,7 @@ export async function getAllProjects() {
  * Get project by ID (optional)
  */
 export async function getProjectById(id) {
-  const [rows] = await pool.query(`
+  const { rows } = await pool.query(`
     SELECT 
       projects.id,
       projects.name,
@@ -32,7 +32,7 @@ export async function getProjectById(id) {
     FROM projects
     INNER JOIN organizations
       ON projects.organization_id = organizations.id
-    WHERE projects.id = ?
+    WHERE projects.id = $1
   `, [id]);
 
   return rows[0];
