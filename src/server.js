@@ -4,9 +4,9 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 // Routes (MVC style)
-import organizationRoutes from "./src/routes/organizationRoutes.js";
-import projectRoutes from "./src/routes/projectRoutes.js";
-import categoryRoutes from "./src/routes/categoryRoutes.js";
+import organizationRoutes from "./routes/organizationRoutes.js";
+import projectRoutes from "./routes/projectRoutes.js";
+import categoryRoutes from "./routes/categoryRoutes.js";
 
 dotenv.config();
 
