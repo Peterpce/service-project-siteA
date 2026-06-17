@@ -3,10 +3,10 @@ import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 
-// Models (named exports)
-import { getAllOrganizations } from "./src/models/organizationModel.js";
-import { getAllProjects } from "./src/models/projectModel.js";
-import { getAllCategories } from "./src/models/categoryModel.js";
+// Routes (MVC style)
+import organizationRoutes from "./src/routes/organizationRoutes.js";
+import projectRoutes from "./src/routes/projectRoutes.js";
+import categoryRoutes from "./src/routes/categoryRoutes.js";
 
 dotenv.config();
 
@@ -18,11 +18,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // =========================
-// VIEW ENGINE (FIXED)
+// VIEW ENGINE
 // =========================
 app.set("view engine", "ejs");
-
-// ✅ FIX: point to correct MVC views folder
 app.set("views", path.join(__dirname, "src/views"));
 
 // =========================
@@ -31,61 +29,17 @@ app.set("views", path.join(__dirname, "src/views"));
 app.use(express.static(path.join(__dirname, "public")));
 
 // =========================
+// ROUTES (MVC CLEAN STRUCTURE)
+// =========================
+app.use("/organizations", organizationRoutes);
+app.use("/projects", projectRoutes);
+app.use("/categories", categoryRoutes);
+
+// =========================
 // HOME ROUTE
 // =========================
 app.get("/", (req, res) => {
     res.render("index", { title: "Home" });
-});
-
-// =========================
-// ORGANIZATIONS
-// =========================
-app.get("/organizations", async (req, res) => {
-    try {
-        const organizations = await getAllOrganizations();
-
-        res.render("organizations", {
-            title: "Organizations",
-            organizations
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).send("Server Error");
-    }
-});
-
-// =========================
-// PROJECTS
-// =========================
-app.get("/projects", async (req, res) => {
-    try {
-        const projects = await getAllProjects();
-
-        res.render("projects", {
-            title: "Projects",
-            projects
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).send("Server Error");
-    }
-});
-
-// =========================
-// CATEGORIES
-// =========================
-app.get("/categories", async (req, res) => {
-    try {
-        const categories = await getAllCategories();
-
-        res.render("categories", {
-            title: "Categories",
-            categories
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).send("Server Error");
-    }
 });
 
 // =========================
