@@ -14,6 +14,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // Fix __dirname for ES Modules
+// Since server.js is inside 'src', __dirname points directly to the 'src' folder
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -21,12 +22,14 @@ const __dirname = path.dirname(__filename);
 // VIEW ENGINE
 // =========================
 app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "src/views"));
+// Look directly inside the current 'src' directory for the 'views' folder
+app.set("views", path.join(__dirname, "views"));
 
 // =========================
 // STATIC FILES
 // =========================
-app.use(express.static(path.join(__dirname, "public")));
+// Step up one level (..) out of 'src' to find the 'public' folder in the root
+app.use(express.static(path.join(__dirname, "../public")));
 
 // =========================
 // ROUTES (MVC CLEAN STRUCTURE)
