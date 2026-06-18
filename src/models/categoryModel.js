@@ -1,26 +1,40 @@
 import pool from "../../database/db.js";
 
-/**
- * Get all categories
- */
+// GET all categories (list page)
 export async function getAllCategories() {
-  // Changed [rows] to { rows }
-  const { rows } = await pool.query(
-    "SELECT id, name FROM categories ORDER BY name ASC"
-  );
+    const sql = `
+        SELECT *
+        FROM categories
+        ORDER BY name
+    `;
 
-  return rows;
+    const result = await pool.query(sql);
+    return result.rows;
 }
 
-/**
- * Get category by ID (optional)
- */
+// GET category by ID (details page)
 export async function getCategoryById(id) {
-  // Changed [rows] to { rows } and "?" to "$1"
-  const { rows } = await pool.query(
-    "SELECT id, name FROM categories WHERE id = $1",
-    [id]
-  );
+    const sql = `
+        SELECT *
+        FROM categories
+        WHERE id = $1
+    `;
 
-  return rows[0];
+    const result = await pool.query(sql, [id]);
+    return result.rows[0];
+}
+
+// GET all projects under a category
+export async function getProjectsByCategory(categoryId) {
+    const sql = `
+        SELECT projects.*
+        FROM projects
+        JOIN project_categories
+            ON projects.id = project_categories.project_id
+        WHERE project_categories.category_id = $1
+        ORDER BY projects.name
+    `;
+
+    const result = await pool.query(sql, [categoryId]);
+    return result.rows;
 }

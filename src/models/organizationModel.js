@@ -1,27 +1,38 @@
 import pool from "../../database/db.js";
 
-/**
- * Get all organizations
- */
+// GET all organizations
 export async function getAllOrganizations() {
-  // PostgreSQL uses object destructuring { rows } instead of array destructuring [rows]
-  const { rows } = await pool.query(
-    "SELECT id, name, description FROM organizations ORDER BY id ASC"
-  );
+    const sql = `
+        SELECT *
+        FROM organizations
+        ORDER BY name
+    `;
 
-  return rows;
+    const result = await pool.query(sql);
+    return result.rows;
 }
 
-/**
- * Get organization by ID (optional)
- */
+// GET organization by ID
 export async function getOrganizationById(id) {
-  // 1. Changed [rows] to { rows }
-  // 2. Changed MySQL placeholder "?" to PostgreSQL placeholder "$1"
-  const { rows } = await pool.query(
-    "SELECT id, name, description FROM organizations WHERE id = $1",
-    [id]
-  );
+    const sql = `
+        SELECT *
+        FROM organizations
+        WHERE id = $1
+    `;
 
-  return rows[0];
+    const result = await pool.query(sql, [id]);
+    return result.rows[0];
+}
+
+// GET all projects for a specific organization
+export async function getProjectsByOrganization(id) {
+    const sql = `
+        SELECT *
+        FROM projects
+        WHERE organization_id = $1
+        ORDER BY name
+    `;
+
+    const result = await pool.query(sql, [id]);
+    return result.rows;
 }
