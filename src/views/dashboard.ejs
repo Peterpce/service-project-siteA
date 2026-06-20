@@ -1,76 +1,85 @@
 <%- include('partials/header') %>
 
-<div class="dashboard-container">
+<!-- Flash Messages -->
+<% if (locals.messages) { %>
+  <div class="flash-container container" style="margin-top: 1rem;">
+    <%- locals.messages %>
+  </div>
+<% } %>
+
+<div class="dashboard-container container" style="padding: 2rem 1rem;">
 
   <h1>Dashboard</h1>
 
-  <p>Welcome, <strong><%= user?.name %></strong></p>
-  <p>Email: <%= user?.email %></p>
-  <p>Role: <%= user?.role %></p>
-
-  <hr>
-
-  <h2>Quick Links</h2>
-
-  <ul>
-    <li><a href="/organizations">Organizations</a></li>
-    <li><a href="/projects">Projects</a></li>
-    <li><a href="/categories">Categories</a></li>
-  </ul>
-
-  <% if (user?.role === "admin") { %>
-    <hr>
-
-    <h2>Admin Panel</h2>
-
-    <ul>
-      <li><a href="/users">Manage Users</a></li>
-    </ul>
+  <% if (locals.user) { %>
+    <p>Welcome, <strong><%= user.name %></strong></p>
+    <p>Email: <%= user.email %></p>
+    <p>Role: <span class="role-badge" style="font-weight: bold; text-transform: capitalize;"><%= user.role %></span></p>
+  <% } else { %>
+    <p>Welcome, <strong>Guest</strong></p>
   <% } %>
 
-  <hr>
+  <hr style="margin: 1.5rem 0; border-top: 1px solid #ddd;">
+
+  <h2>Quick Links</h2>
+  <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.5rem;">
+    <li><a href="/organizations" class="btn">View Organizations</a></li>
+    <li><a href="/projects" class="btn">View Projects</a></li>
+    <li><a href="/categories" class="btn">View Categories</a></li>
+  </ul>
 
   <!-- ========================= -->
-  <!-- W06 VOLUNTEER SECTION -->
+  <!-- ⭐ VOLUNTEER SECTION (NEW) -->
   <!-- ========================= -->
 
-  <h2>My Volunteer Projects</h2>
+  <% if (locals.volunteerProjects && volunteerProjects.length > 0) { %>
 
-  <% if (volunteerProjects && volunteerProjects.length > 0) { %>
+    <hr style="margin: 2rem 0; border-top: 1px solid #ddd;">
 
-    <ul>
+    <h2>My Volunteer Projects</h2>
 
+    <ul style="list-style: none; padding: 0; margin-top: 1rem;">
       <% volunteerProjects.forEach(project => { %>
-
-        <li>
+        <li style="margin-bottom: 0.8rem;">
           <strong><%= project.name %></strong>
 
-          <!-- View project -->
-          <a href="/projects/<%= project.id %>">View</a>
-
-          <!-- Remove volunteer -->
-          <form
-            action="/projects/<%= project.id %>/unvolunteer"
-            method="POST"
-            style="display:inline;"
-          >
-            <button type="submit">Remove</button>
+          <form action="/remove-volunteer/<%= project.id %>" method="POST" style="display:inline;">
+            <button type="submit" class="btn" style="background-color: #dc2626; margin-left: 10px;">
+              Remove
+            </button>
           </form>
         </li>
-
       <% }) %>
-
     </ul>
 
-  <% } else { %>
+  <% } else if (locals.user) { %>
 
+    <hr style="margin: 2rem 0; border-top: 1px solid #ddd;">
     <p>You have not volunteered for any projects yet.</p>
 
   <% } %>
 
-  <hr>
+  <!-- ========================= -->
 
-  <a href="/logout">Logout</a>
+  <% if (locals.user && (user.role === "admin" || user.role === "Admin" || user.account_type === "Admin" || user.account_type === "Employee")) { %>
+
+    <hr style="margin: 2rem 0; border-top: 1px solid #bfdbfe;">
+
+    <h2 style="color: #1e40af;">Admin Panel</h2>
+
+    <ul style="list-style: none; padding: 0;">
+      <li>
+        <a href="/users" class="btn" style="background-color: #1e40af;">
+          👤 Manage Users
+        </a>
+      </li>
+    </ul>
+
+  <% } %>
+
+  <hr style="margin: 2rem 0; border-top: 1px solid #ddd;">
+
+  <a href="/logout" style="color: #dc2626; font-weight: bold;">Logout</a>
 
 </div>
 

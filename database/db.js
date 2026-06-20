@@ -5,12 +5,20 @@ dotenv.config();
 
 const { Pool } = pg;
 
-const pool = new Pool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    port: process.env.DB_PORT,
+const db = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.DATABASE_URL.includes("localhost") 
+    ? false 
+    : { rejectUnauthorized: false }
 });
 
-export default pool;
+// Test connection cleanly
+db.query("SELECT NOW()")
+  .then(() => {
+    console.log("🚀 Connected to PostgreSQL database successfully!");
+  })
+  .catch((err) => {
+    console.error("❌ Database query failed:", err.message);
+  });
+
+export default db;

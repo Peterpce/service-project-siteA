@@ -1,21 +1,25 @@
-const express = require("express");
+import express from "express";
+import {
+  volunteerForProject,
+  removeVolunteer
+} from "../controllers/volunteerController.js";
+
+import { requireLogin } from "../middleware/authMiddleware.js";
+
 const router = express.Router();
 
-const volunteerController = require("../controllers/volunteerController");
-const { requireLogin } = require("../middleware/authMiddleware");
-
-// Add user as volunteer (join project)
+// Add user as volunteer
 router.post(
   "/projects/:id/volunteer",
   requireLogin,
-  volunteerController.volunteerForProject
+  volunteerForProject
 );
 
-// Remove user as volunteer (leave project)
+// Remove user as volunteer
 router.post(
   "/projects/:id/remove-volunteer",
   requireLogin,
-  volunteerController.removeVolunteer
+  removeVolunteer
 );
 
-module.exports = router;
+export default router;

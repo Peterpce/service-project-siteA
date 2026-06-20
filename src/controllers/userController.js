@@ -8,8 +8,8 @@ export async function getDashboardPage(req, res, next) {
   try {
     res.render("dashboard", { 
       title: "Dashboard",
-      user: req.session.user
-      // ✨ locals.error / locals.success / locals.message are handled globally by server.js now!
+      user: req.session.user,
+      message: req.flash("message")[0] || null
     });
   } catch (error) {
     next(error);
@@ -18,16 +18,17 @@ export async function getDashboardPage(req, res, next) {
 
 /**
  * ADMIN: GET ALL USERS
- * Only accessible by admin
+ * Only accessible by admin (protected in routes via middleware)
  */
 export async function getUsersPage(req, res, next) {
   try {
     const users = await getAllUsers();
 
+    // ✨ UPDATED: Pointed explicitly to the "users/list" subfolder view path
     res.render("users/list", {
       title: "Registered Users",
       users,
-      user: req.session.user
+      message: req.flash("message")[0] || null
     });
 
   } catch (error) {

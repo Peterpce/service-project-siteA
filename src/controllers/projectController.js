@@ -1,18 +1,15 @@
 import * as projectModel from "../models/projectModel.js";
 import * as categoryModel from "../models/categoryModel.js";
-import * as volunteerModel from "../models/volunteerModel.js"; // ✅ NEW
+import * as volunteerModel from "../models/volunteerModel.js";
 
 // GET all projects (list page)
 export async function getAllProjects(req, res, next) {
     try {
-        const projects =
-            await projectModel.getAllProjects();
-
+        const projects = await projectModel.getAllProjects();
         res.render("project/list", {
             title: "Projects",
             projects
         });
-
     } catch (error) {
         next(error);
     }
@@ -22,9 +19,7 @@ export async function getAllProjects(req, res, next) {
 export async function getProjectById(req, res, next) {
     try {
         const id = req.params.id;
-
-        const project =
-            await projectModel.getProjectById(id);
+        const project = await projectModel.getProjectById(id);
 
         if (!project) {
             return res.status(404).render("404", {
@@ -32,21 +27,15 @@ export async function getProjectById(req, res, next) {
             });
         }
 
-        const organization =
-            await projectModel.getOrganizationByProject(id);
+        const organization = await projectModel.getOrganizationByProject(id);
+        const categories = await projectModel.getCategoriesByProject(id);
 
-        const categories =
-            await projectModel.getCategoriesByProject(id);
-
-        // ✅ NEW: check volunteer status
         let isVolunteer = false;
-
         if (req.session.user) {
-            isVolunteer =
-                await volunteerModel.isVolunteer(
-                    req.session.user.user_id,
-                    id
-                );
+            isVolunteer = await volunteerModel.isVolunteer(
+                req.session.user.id,
+                id
+            );
         }
 
         res.render("project/detail", {
@@ -54,10 +43,9 @@ export async function getProjectById(req, res, next) {
             project,
             organization,
             categories,
-            user: req.session.user, // ✅ required for EJS access control
-            isVolunteer              // ✅ controls UI toggle
+            user: req.session.user,
+            isVolunteer
         });
-
     } catch (error) {
         next(error);
     }
@@ -75,9 +63,7 @@ export function showCreateForm(req, res) {
 export async function showEditForm(req, res, next) {
     try {
         const id = req.params.id;
-
-        const project =
-            await projectModel.getProjectById(id);
+        const project = await projectModel.getProjectById(id);
 
         if (!project) {
             return res.status(404).render("404", {
@@ -90,19 +76,22 @@ export async function showEditForm(req, res, next) {
             project,
             errors: []
         });
-
     } catch (error) {
         next(error);
     }
 }
 
-// SHOW ASSIGN CATEGORY FORM
+// ============================
+// CATEGORY ASSIGNMENT (FIXED MISSING FUNCTION)
+// ============================
+
+// GET assign category form
 export async function showAssignCategoryForm(req, res, next) {
     try {
         const id = req.params.id;
 
-        const project =
-            await projectModel.getProjectById(id);
+        const project = await projectModel.getProjectById(id);
+        const categories = await categoryModel.getAllCategories();
 
         if (!project) {
             return res.status(404).render("404", {
@@ -110,43 +99,28 @@ export async function showAssignCategoryForm(req, res, next) {
             });
         }
 
-        const categories =
-            await categoryModel.getAllCategories();
-
-        const assigned =
-            await projectModel.getCategoriesByProject(id);
-
-        const assignedCategories = assigned.map(c => c.id);
-
         res.render("project/assign-category", {
             title: "Assign Categories",
             project,
-            categories,
-            assignedCategories,
-            errors: []
+            categories
         });
-
     } catch (error) {
         next(error);
     }
 }
 
-//
 // ============================
-// ✅ VOLUNTEER FEATURE (W06)
+// VOLUNTEER FEATURE ROUTE ACTION HANDLERS
 // ============================
-//
 
 // POST: Volunteer for a project
 export async function volunteerForProject(req, res, next) {
     try {
-        const userId = req.session.user.user_id;
+        const userId = req.session.user.id;
         const projectId = req.params.id;
 
         await volunteerModel.addVolunteer(userId, projectId);
-
         res.redirect(`/projects/${projectId}`);
-
     } catch (error) {
         next(error);
     }
@@ -155,13 +129,11 @@ export async function volunteerForProject(req, res, next) {
 // POST: Remove volunteer
 export async function removeVolunteer(req, res, next) {
     try {
-        const userId = req.session.user.user_id;
+        const userId = req.session.user.id;
         const projectId = req.params.id;
 
         await volunteerModel.removeVolunteer(userId, projectId);
-
         res.redirect(`/projects/${projectId}`);
-
     } catch (error) {
         next(error);
     }

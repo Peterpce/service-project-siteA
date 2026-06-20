@@ -5,13 +5,8 @@ dotenv.config();
 
 const { Pool } = pg;
 
-// ✅ Use your .env variables (NOT DATABASE_URL)
-const pool = new Pool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    port: process.env.DB_PORT,
+const db = new Pool({
+  connectionString: process.env.DATABASE_URL,
 });
 
-export default pool;
+export default db;
